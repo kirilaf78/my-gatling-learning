@@ -16,4 +16,8 @@
 		<appender-ref ref="CONSOLE" />
 	</root>
 
+<logger name="io.gatling.http.engine.response" level="TRACE" />
+
+
+
 </configuration>
