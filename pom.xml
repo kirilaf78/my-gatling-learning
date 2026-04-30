@@ -2,28 +2,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>io.komoda.demo</groupId>
   <artifactId>gatling-apitesting-crash-course</artifactId>
-  <version>3.9.0</version>
+  <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <!-- use the following if you're compiling with JDK 8-->
-<!--    <maven.compiler.source>1.8</maven.compiler.source>-->
-<!--    <maven.compiler.target>1.8</maven.compiler.target>-->
-    <!-- comment the 2 lines above and uncomment the line bellow if you're compiling with JDK 11 or 17 -->
-        <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gatling.version>${project.version}</gatling.version>
-    <gatling-maven-plugin.version>4.2.9</gatling-maven-plugin.version>
-    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+    <gatling.version>3.13.5</gatling.version>
+    <gatling-maven-plugin.version>4.11.0</gatling-maven-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
   </properties>
 
   <dependencies>
+    <!-- Основной пакет Gatling -->
     <dependency>
       <groupId>io.gatling.highcharts</groupId>
       <artifactId>gatling-charts-highcharts</artifactId>
+      <version>${gatling.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Эти зависимости НУЖНЫ для Engine.java и Recorder.java -->
+    <dependency>
+      <groupId>io.gatling</groupId>
+      <artifactId>gatling-app</artifactId>
+      <version>${gatling.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gatling</groupId>
+      <artifactId>gatling-recorder</artifactId>
       <version>${gatling.version}</version>
       <scope>test</scope>
     </dependency>
@@ -36,17 +45,9 @@
         <version>${maven-compiler-plugin.version}</version>
       </plugin>
       <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
-      </plugin>
-      <plugin>
         <groupId>io.gatling</groupId>
         <artifactId>gatling-maven-plugin</artifactId>
         <version>${gatling-maven-plugin.version}</version>
-        <configuration>
-          <!-- Enterprise Cloud (https://cloud.gatling.io/) configuration reference: https://gatling.io/docs/gatling/reference/current/extensions/maven_plugin/#working-with-gatling-enterprise-cloud -->
-          <!-- Enterprise Self-Hosted configuration reference: https://gatling.io/docs/gatling/reference/current/extensions/maven_plugin/#working-with-gatling-enterprise-self-hosted -->
-        </configuration>
       </plugin>
     </plugins>
   </build>
