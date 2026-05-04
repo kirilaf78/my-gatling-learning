@@ -13,32 +13,11 @@ public class VideoGameDbSimulation extends Simulation {
             .acceptHeader("application/json")
             .contentTypeHeader("application/json");
 
-    private ScenarioBuilder scn = scenario("Video Game DB Stress Test")
-            .feed(csvFeeder) // Each time a user enters the scenario, they take a new line from the CSV
-            .exec(authenticate)
-            .pause(2)
-            .exec(createNewGame)
-            .pause(2)
-            .exec(http("Verify API is alive")
-                    .get("/videogame/1")
-                    .check(status().is(200)));
     // authenticate video game db:
     private static ChainBuilder authenticate = exec(http("Authenticate")
             .post("/authenticate")
             .body(StringBody("{\"password\": \"admin\", \"username\": \"admin\"}"))
             .check(jsonPath("$.token").saveAs("jwtToken")));
-
-    {
-        setUp(
-                scn.injectOpen(
-                        // 1. First run one scout
-                        atOnceUsers(1),
-                        // 2. Then pause for 5 seconds
-                        nothingFor(5),
-                        // 3. Then smoothly introduce 10 users over 30 seconds
-                        rampUsers(10).during(30)))
-                .protocols(httpProtocol);
-    }
 
     private static ChainBuilder createNewGame = exec(http("Create new game - #{gameName}")
             .post("/videogame")
@@ -52,4 +31,34 @@ public class VideoGameDbSimulation extends Simulation {
                             "  \"releaseDate\": \"2025-05-04\", " +
                             "  \"reviewScore\": 99" +
                             "}")));
+
+    private ChainBuilder verifyApi = 
+        exec(http("Verify API is alive")
+            .get("/videogame/1")
+            .check(status().is(200)));              
+
+    ScenarioBuilder scn = scenario("Video Game DB Stress Test")
+            .feed(csvFeeder)   // Each user will take one line from the CSV file
+            .exec(authenticate)
+            .pause(2)
+            .exec(createNewGame)
+            .pause(2)
+            .exec(verifyApi);
+
+    {
+        setUp(
+                scn.injectOpen(
+                        atOnceUsers(5), // Five users at once
+                        rampUsers(50).during(30) // Add 50 users over 30 seconds
+                )
+        ).protocols(httpProtocol)
+                .assertions(
+                        // Check: 95th percentile of response time should be less than 800 ms
+                        global().responseTime().percentile3().lt(800),
+                        // Check: 100% successful responses from the server
+                        global().successfulRequests().percent().is(100.0)
+                );
+    }
+
+
 }
