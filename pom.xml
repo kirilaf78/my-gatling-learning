@@ -48,6 +48,11 @@
         <groupId>io.gatling</groupId>
         <artifactId>gatling-maven-plugin</artifactId>
         <version>${gatling-maven-plugin.version}</version>
+        <configuration>
+          <jvmArgs>
+            <jvmArg>-Duser.timezone=Europe/Budapest</jvmArg>
+          </jvmArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>
